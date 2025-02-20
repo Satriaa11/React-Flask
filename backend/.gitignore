@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+instance/
+venv/
+env/
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite3
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Frontend build artifacts (sesuaikan jika diperlukan)
+frontend/build/
+frontend/dist/
+frontend/node_modules/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# Dependency directories
+lib/
+libs/
