@@ -9,9 +9,10 @@ instance/
 venv/
 env/
 .env
+packages/
 
 # IDE
-.vscode/
+.vscode/*
 .idea/
 
 # Logs
