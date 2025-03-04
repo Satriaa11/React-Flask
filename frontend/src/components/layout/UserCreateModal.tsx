@@ -1,84 +1,151 @@
 import { MdOutlineLibraryAdd } from "react-icons/md";
 import { useState } from "react";
+import { addFriend } from "../../utils/api";
+import { Friends } from "../../types/user";
 
-function UserCreateModal() {
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-  const [description, setDescription] = useState("");
-  const [gender, setGender] = useState("male");
+interface UserCreateModalProps {
+  onUserAdded: (newUser: Friends) => void;
+}
+
+function UserCreateModal({ onUserAdded }: UserCreateModalProps) {
+  const [isLoading, setLoading] = useState(false);
+  const [inputs, setInputs] = useState({
+    name: "",
+    role: "",
+    description: "",
+    gender: "",
+  });
   const openModal = () => {
     const modal = document.getElementById(
-      "my_modal_3",
+      "create_modal",
     ) as HTMLDialogElement | null;
     if (modal) {
       modal.showModal();
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const showToast = (message: string, type: "success" | "error") => {
+    const toast = document.createElement("div");
+    toast.className = `toast toast-top toast-end`;
+
+    const alert = document.createElement("div");
+    alert.className = `alert ${type === "success" ? "alert-success" : "alert-error"}`;
+    alert.innerHTML = `<span>${message}</span>`;
+
+    toast.appendChild(alert);
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log({ name, role, description, gender });
-    // Reset form fields
-    setName("");
-    setRole("");
-    setDescription("");
-    setGender("male");
-    // Close modal
-    const modal = document.getElementById(
-      "my_modal_3",
-    ) as HTMLDialogElement | null;
-    if (modal) {
-      modal.close();
+    setLoading(true);
+    try {
+      const newFriend = {
+        ...inputs,
+        id: 0,
+      };
+      const result = await addFriend(newFriend);
+      if (result) {
+        // Reset form inputs
+        setInputs({
+          name: "",
+          role: "",
+          description: "",
+          gender: "",
+        });
+
+        // Show success toast
+        showToast(`Successfully added ${result.name} as a friend!`, "success");
+
+        // Panggil fungsi callback untuk memperbarui daftar user
+        onUserAdded(result);
+      }
+
+      // Close modal
+      const modal = document.getElementById(
+        "create_modal",
+      ) as HTMLDialogElement | null;
+      if (modal) {
+        modal.close();
+      }
+
+      // Hapus baris ini karena kita sudah menggunakan onUserAdded
+      // setUsers((prevUsers) => [...prevUsers, data]);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      showToast("Failed to add friend. Please try again.", "error");
+      setLoading(false);
     }
   };
 
   return (
     <>
-      <button className="btn" onClick={openModal}>
-        <MdOutlineLibraryAdd className="h-5 w-5  " />
+      <button className="btn btn-ghost" onClick={openModal}>
+        <MdOutlineLibraryAdd className="h-5 w-5" />
       </button>
-      <dialog id="my_modal_3" className="modal">
+
+      <dialog id="create_modal" className="modal">
         <div className="modal-box">
           <form method="dialog">
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
               ✕
             </button>
           </form>
+
           <h3 className="font-bold text-lg">Add New Friend 😀</h3>
           <form onSubmit={handleSubmit}>
             <div className="pt-7 pb-5  flex flex-row justify-between gap-2">
               <div className="flex flex-col ">
-                <label className="mb-2 font-bold">Add Friend:</label>
+                <label className="label">
+                  <span className="label-text font-bold text-base">Name </span>
+                </label>{" "}
                 <input
                   type="text"
                   placeholder="Friend's Name"
                   className="input input-bordered w-full"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  value={inputs.name}
+                  onChange={(e) =>
+                    setInputs({ ...inputs, name: e.target.value })
+                  }
                   required
                 />
               </div>
               <div className="flex flex-col ">
-                <label className="mb-2 font-bold">Role:</label>
+                <label className="label">
+                  <span className="label-text font-bold text-base">Role </span>
+                </label>
                 <input
                   type="text"
                   placeholder="Friend's Role"
                   className="input input-bordered w-full"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
+                  value={inputs.role}
+                  onChange={(e) =>
+                    setInputs({ ...inputs, role: e.target.value })
+                  }
                   required
                 />
               </div>
             </div>
-            <div className="flex flex-col">
-              <label className="mb-2 font-bold">Description:</label>
-              <input
-                type="text"
+
+            <div className="form-control max-w-full">
+              <label className="label">
+                <span className="label-text font-bold text-base">
+                  Description
+                </span>
+              </label>
+              <textarea
                 placeholder="Friend's Description"
-                className="input input-bordered w-full"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
+                className="textarea textarea-bordered w-full h-36"
+                value={inputs.description}
+                onChange={(e) =>
+                  setInputs({ ...inputs, description: e.target.value })
+                }
                 required
               />
             </div>
@@ -92,8 +159,9 @@ function UserCreateModal() {
                     name="gender"
                     value="male"
                     className="radio checked:bg-blue-500"
-                    checked={gender === "male"}
-                    onChange={() => setGender("male")}
+                    checked={inputs.gender === "male"}
+                    onChange={() => setInputs({ ...inputs, gender: "male" })}
+                    required
                   />
                 </label>
               </div>
@@ -105,27 +173,32 @@ function UserCreateModal() {
                     name="gender"
                     value="female"
                     className="radio checked:bg-blue-500"
-                    checked={gender === "female"}
-                    onChange={() => setGender("female")}
+                    checked={inputs.gender === "female"}
+                    onChange={() => setInputs({ ...inputs, gender: "female" })}
                   />
                 </label>
               </div>
             </div>
 
-            <div className="flex flex-row justify-end gap-2 pt-8">
+            <div className="flex flex-row justify-end gap-4 pt-8">
               <button
                 type="button"
-                className="btn btn-sm btn-ghost"
+                className="btn btn-md btn-ghost"
                 onClick={() =>
                   (
-                    document.getElementById("my_modal_3") as HTMLDialogElement
+                    document.getElementById("create_modal") as HTMLDialogElement
                   )?.close()
                 }
               >
                 Cancel
               </button>
-              <button type="submit" className="btn btn-sm btn-primary">
-                Add Friend
+
+              <button
+                type="submit"
+                className="btn btn-md btn-primary"
+                disabled={isLoading}
+              >
+                {isLoading ? "Adding..." : "Add Friend"}
               </button>
             </div>
           </form>

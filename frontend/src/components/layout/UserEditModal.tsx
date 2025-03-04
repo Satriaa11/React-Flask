@@ -1,14 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RiEditBoxLine } from "react-icons/ri";
+import { Friends } from "../../types/user";
 
-function UserEditModal() {
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-  const [description, setDescription] = useState("");
+interface UserEditModalProps {
+  user: Friends;
+  onUpdate: (updatedUser: Friends) => void;
+}
+
+function UserEditModal({ user, onUpdate }: UserEditModalProps) {
+  const [name, setName] = useState(user.name);
+  const [role, setRole] = useState(user.role);
+  const [description, setDescription] = useState(user.description);
+
+  // Buat ID modal yang unik berdasarkan ID user
+  const modalId = `edit_modal_${user.id}`;
+
+  useEffect(() => {
+    // Update state ketika props user berubah
+    setName(user.name);
+    setRole(user.role);
+    setDescription(user.description);
+  }, [user]);
+
   const openModal = () => {
-    const modal = document.getElementById(
-      "my_modal_3",
-    ) as HTMLDialogElement | null;
+    const modal = document.getElementById(modalId) as HTMLDialogElement | null;
     if (modal) {
       modal.showModal();
     }
@@ -16,16 +31,9 @@ function UserEditModal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log({ name, role, description });
-    // Reset form fields
-    setName("");
-    setRole("");
-    setDescription("");
+    onUpdate({ ...user, name, role, description });
     // Close modal
-    const modal = document.getElementById(
-      "my_modal_3",
-    ) as HTMLDialogElement | null;
+    const modal = document.getElementById(modalId) as HTMLDialogElement | null;
     if (modal) {
       modal.close();
     }
@@ -34,67 +42,69 @@ function UserEditModal() {
   return (
     <>
       <button className="btn btn-sm btn-ghost" onClick={openModal}>
-        <RiEditBoxLine className="h-5 w-5 " />
+        <RiEditBoxLine className="h-5 w-5" />
       </button>
-      <dialog id="my_modal_3" className="modal">
+      <dialog id={modalId} className="modal modal-bottom sm:modal-middle">
         <div className="modal-box">
-          <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              ✕
-            </button>
-          </form>
-          <h3 className="font-bold text-lg">Add New Friend 😀</h3>
-          <form onSubmit={handleSubmit}>
-            <div className="pt-7 pb-5  flex flex-row justify-between gap-2">
-              <div className="flex flex-col ">
-                <label className="mb-2 font-bold">Add Friend:</label>
-                <input
-                  type="text"
-                  placeholder="Friend's Name"
-                  className="input input-bordered w-full"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex flex-col ">
-                <label className="mb-2 font-bold">Role:</label>
-                <input
-                  type="text"
-                  placeholder="Friend's Role"
-                  className="input input-bordered w-full"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-            <div className="flex flex-col">
-              <label className="mb-2 font-bold">Description:</label>
+          <h3 className="font-bold text-lg mb-4">Edit Friend</h3>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-base font-bold">Name</span>
+              </label>
               <input
                 type="text"
-                placeholder="Friend's Description"
+                placeholder="Friend's Name"
                 className="input input-bordered w-full"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-base font-bold">Role</span>
+              </label>
+              <input
+                type="text"
+                placeholder="Friend's Role"
+                className="input input-bordered w-full"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="form-control w-full">
+              <label className="label">
+                <span className="label-text text-base font-bold">
+                  Description
+                </span>
+              </label>
+              <textarea
+                placeholder="Friend's Description"
+                className="textarea textarea-bordered w-full"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 required
               />
             </div>
 
-            <div className="flex flex-row justify-end gap-2 pt-8">
+            <div className="modal-action">
               <button
                 type="button"
-                className="btn btn-sm btn-ghost"
+                className="btn btn-md btn-ghost"
                 onClick={() =>
                   (
-                    document.getElementById("my_modal_3") as HTMLDialogElement
+                    document.getElementById(modalId) as HTMLDialogElement
                   )?.close()
                 }
               >
                 Cancel
               </button>
-              <button type="submit" className="btn btn-sm btn-primary">
-                Edit
+              <button type="submit" className="btn btn-md btn-primary">
+                Save
               </button>
             </div>
           </form>
@@ -103,4 +113,5 @@ function UserEditModal() {
     </>
   );
 }
+
 export default UserEditModal;

@@ -2,9 +2,14 @@ import { useEffect, useState } from "react";
 import { themeChange } from "theme-change";
 import { LuSun } from "react-icons/lu";
 import { IoMoonOutline } from "react-icons/io5";
-import UserModel from "./UserCreateModal";
+import UserCreateModal from "./UserCreateModal";
+import { Friends } from "../../types/user";
 
-function Navbar() {
+interface NavbarProps {
+  onUserAdded: (newUser: Friends) => void;
+}
+
+function Navbar({ onUserAdded }: NavbarProps) {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "nord");
 
   useEffect(() => {
@@ -19,8 +24,8 @@ function Navbar() {
   };
 
   return (
-    <div className="navbar bg-base-100 rounded-xl flex flex-row justify-between py-5">
-      <a className=" text-xl font-medium">React + Flask 👻</a>
+    <div className="navbar bg-base-100 flex flex-row justify-between py-5">
+      <h1 className=" text-xl font-medium">React + Flask 👻</h1>
 
       <div className="gap-2">
         <label className="swap swap-rotate">
@@ -33,7 +38,7 @@ function Navbar() {
           <IoMoonOutline className="swap-off h-6 w-6 fill-current" />
         </label>
 
-        <UserModel />
+        <UserCreateModal onUserAdded={onUserAdded} />
       </div>
     </div>
   );

@@ -1,8 +1,75 @@
-import { RiDeleteBin6Line } from "react-icons/ri";
-import { User } from "../../types/user"; // Asumsikan Anda memiliki tipe User
+import { Friends } from "../../types/user";
 import UserEditModal from "./UserEditModal";
+import { useState } from "react";
+import UserDeleteModal from "./UserDeleteModal";
+import { deleteFriend, updateFriend } from "../../utils/api";
 
-const UserCard = ({ user }: { user: User }) => {
+// Tambahkan onDelete ke props
+interface UserCardProps {
+  user: Friends;
+  onDelete?: () => void; // Buat opsional dengan tanda ?
+}
+
+const UserCard = ({ user: initialUser, onDelete }: UserCardProps) => {
+  const [user, setUser] = useState(initialUser);
+
+  // Fungsi untuk menampilkan toast
+  const showToast = (
+    message: string,
+    type: "success" | "error" | "info" | "warning",
+  ) => {
+    // Buat elemen toast
+    const toast = document.createElement("div");
+    toast.className = `alert alert-${type} fixed top-4 right-4 z-50 w-auto max-w-sm shadow-lg`;
+
+    // Isi konten toast
+    toast.innerHTML = `
+      <div>
+        <span>${message}</span>
+      </div>
+    `;
+
+    // Tambahkan ke DOM
+    document.body.appendChild(toast);
+
+    // Hapus toast setelah 3 detik
+    setTimeout(() => {
+      toast.classList.add("opacity-0", "transition-opacity", "duration-500");
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 500);
+    }, 3000);
+  };
+
+  const handleUpdateUser = async (updatedUser: Friends) => {
+    try {
+      const result = await updateFriend(updatedUser.id, updatedUser);
+      if (result) {
+        setUser(result);
+        showToast(`Data ${user.name} berhasil diperbarui!`, "success");
+      }
+    } catch (error) {
+      console.error("Failed to update user", error);
+      showToast(`Gagal memperbarui data ${user.name}`, "error");
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      await deleteFriend(user.id);
+
+      // Tampilkan toast sukses
+      showToast(`${user.name} berhasil dihapus dari daftar teman!`, "success");
+
+      // Panggil onDelete callback jika tersedia
+      if (onDelete) onDelete();
+    } catch (error) {
+      console.error("Failed to delete user", error);
+      // Tampilkan toast error
+      showToast(`Gagal menghapus ${user.name}`, "error");
+    }
+  };
+
   return (
     <div className="card card-compact bg-base-300 w-96 shadow-xl">
       <div className="header-container card-body">
@@ -12,7 +79,7 @@ const UserCard = ({ user }: { user: User }) => {
               <div className="w-12 h-12 rounded-full">
                 <img
                   src={
-                    user.avatar ||
+                    user.img_url ||
                     "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
                   }
                   alt="User Avatar"
@@ -25,27 +92,14 @@ const UserCard = ({ user }: { user: User }) => {
             </div>
           </div>
           <div className="card-actions mb-6">
-            {/* <button className="btn btn-sm btn-ghost">
-            //   <svg
-            //     xmlns="http://www.w3.org/2000/svg"
-            //     fill="none"
-            //     viewBox="0 0 24 24"
-            //     strokeWidth={1.5}
-            //     stroke="currentColor"
-            //     className="w-5 h-5"
-            //   >
-            //     <path
-            //       strokeLinecap="round"
-            //       strokeLinejoin="round"
-            //       d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-            //     />
-            //   </svg>
-            </button> */}
-
-            <UserEditModal />
-            <button className="btn btn-sm btn-ghost">
-              <RiDeleteBin6Line className="h-5 w-5" />
-            </button>
+            <UserEditModal user={user} onUpdate={handleUpdateUser} />
+            <UserDeleteModal
+              user={user}
+              onDelete={() => {
+                // Panggil fungsi handleDeleteUser untuk menghapus user
+                handleDeleteUser();
+              }}
+            />
           </div>{" "}
         </div>
         <div className="body-container description mt-2">
