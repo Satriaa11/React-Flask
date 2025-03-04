@@ -1,7 +1,7 @@
-export interface User {
+export interface Friends {
   id: number;
   name: string;
   role: string;
   description: string;
-  avatar?: string;
+  img_url?: string;
 }
