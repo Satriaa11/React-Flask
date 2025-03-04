@@ -45,7 +45,7 @@ def create_friend():
         db.session.add(new_friend)
         db.session.commit()
         logger.info(f"Friend created successfully: {name}")
-        return jsonify({"message": "Friend created successfully"}), 201
+        return jsonify(new_friend.to_json()), 201
 
     except Exception as e:
         db.session.rollback()
@@ -87,7 +87,7 @@ def update_friend(id):
         friend.gender = data.get("gender", friend.gender)
 
         db.session.commit()
-        return jsonify({"message": "Friend updated successfully"}), 200
+        return jsonify(friend.to_json()), 200
 
     except Exception as e:
         db.session.rollback()
