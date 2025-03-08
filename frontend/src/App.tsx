@@ -34,7 +34,7 @@ function App() {
       <Navbar onUserAdded={handleUserAdded} />
       <div className="container mx-auto text-center py-8">
         <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 to-purple-600 text-transparent bg-clip-text">
-          MY FRIENDS
+          Friends Book
         </h1>
       </div>
       <UserGrid users={users} onRefresh={fetchUsers} loading={loading} />

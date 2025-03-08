@@ -71,7 +71,7 @@ const UserCard = ({ user: initialUser, onDelete }: UserCardProps) => {
   };
 
   return (
-    <div className="card card-compact bg-base-300 w-96 shadow-xl">
+    <div className="card card-compact bg-base-300 w-full sm:w-80 md:w-96 shadow-xl">
       <div className="header-container card-body">
         <div className="flex items-center space-x-4 justify-between">
           <div className="flex gap-4">
