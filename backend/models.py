@@ -1,4 +1,3 @@
-# Store database schema
 from app import db
 
 class Friend(db.Model):
