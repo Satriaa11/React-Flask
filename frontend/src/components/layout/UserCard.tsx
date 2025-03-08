@@ -71,10 +71,10 @@ const UserCard = ({ user: initialUser, onDelete }: UserCardProps) => {
   };
 
   return (
-    <div className="card card-compact bg-base-300 w-full sm:w-80 md:w-96 shadow-xl">
-      <div className="header-container card-body">
-        <div className="flex items-center space-x-4 justify-between">
-          <div className="flex gap-4">
+    <div className="card card-compact bg-base-300 w-full shadow-xl h-full">
+      <div className="card-body">
+        <div className="flex justify-between items-start">
+          <div className="flex gap-4 items-center">
             <div className="avatar">
               <div className="w-12 h-12 rounded-full">
                 <img
@@ -87,11 +87,11 @@ const UserCard = ({ user: initialUser, onDelete }: UserCardProps) => {
               </div>
             </div>
             <div>
-              <h3 className="font-bold">{user.name}</h3>
+              <h3 className="font-bold text-lg">{user.name}</h3>
               <p className="text-sm opacity-70">{user.role}</p>
             </div>
           </div>
-          <div className="card-actions mb-6">
+          <div className="card-actions">
             <UserEditModal user={user} onUpdate={handleUpdateUser} />
             <UserDeleteModal
               user={user}
@@ -100,10 +100,12 @@ const UserCard = ({ user: initialUser, onDelete }: UserCardProps) => {
                 handleDeleteUser();
               }}
             />
-          </div>{" "}
+          </div>
         </div>
-        <div className="body-container description mt-2">
-          <p>{user.description}</p>
+        <div className="description mt-4">
+          <p className="text-sm md:text-base line-clamp-3 md:line-clamp-4">
+            {user.description}
+          </p>
         </div>
       </div>
     </div>

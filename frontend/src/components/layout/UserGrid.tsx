@@ -10,18 +10,23 @@ interface UserGridProps {
 
 function UserGrid({ users, onRefresh, loading = false }: UserGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+    <div className="flex flex-wrap gap-4 mb-10">
       {loading ? (
-        <p className="col-span-3 text-center py-10">
+        <div className="w-full text-center py-10">
           <span className="loading loading-bars loading-xl"></span>
-        </p>
+        </div>
       ) : users.length === 0 ? (
-        <p className="col-span-3 text-center py-10 text-gray-500">
+        <div className="w-full text-center py-10 text-gray-500">
           No friends found. Add some friends to see them here.
-        </p>
+        </div>
       ) : (
         users.map((user) => (
-          <UserCard key={user.id} user={user} onDelete={onRefresh} />
+          <div
+            key={user.id}
+            className="w-[1200px] md:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)] flex justify-center"
+          >
+            <UserCard user={user} onDelete={onRefresh} />
+          </div>
         ))
       )}
     </div>

@@ -1,6 +1,6 @@
 import { Friends } from "../types/user";
 
-const API_BASE_URL = "https://react-flask-production.up.railway.app/api";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getFriends = async (): Promise<Friends[]> => {
   try {
