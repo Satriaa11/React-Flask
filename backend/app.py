@@ -7,8 +7,12 @@ app = Flask(__name__)
 CORS(app)
 
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///friends.db'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///instance/friends.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+import os
+db_url = os.environ.get("DATABASE_URL", "sqlite:///instance/friends.db")
+app.config['SQLALCHEMY_DATABASE_URI'] = db_url
+
+
+['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
